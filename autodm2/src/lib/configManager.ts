@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+
 const CONFIG_FILE = path.join(process.cwd(), 'reels_config.json');
 
 export type ReelConfig = {
