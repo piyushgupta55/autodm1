@@ -45,11 +45,11 @@ export async function POST(req: NextRequest) {
             const dmMessage = config.dm_message || "";
             const commentReply = config.comment_reply || "";
 
-            if (dmMessage) {
-              await sendDm(commentId, dmMessage);
-            }
             if (commentReply) {
               await replyToComment(commentId, commentReply);
+            }
+            if (dmMessage) {
+              await sendDm(commentId, dmMessage);
             }
           }
         }

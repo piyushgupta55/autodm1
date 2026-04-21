@@ -19,11 +19,13 @@ export async function sendDm(commentId: string, message: string) {
     body: JSON.stringify(payload)
   });
 
-  return response.json();
+  const data = await response.json();
+  if (data.error) console.error("Instagram DM Error:", data.error);
+  return data;
 }
 
 export async function replyToComment(commentId: string, message: string) {
-  const url = new URL(`${GRAPH_API_URL}/${commentId}/replies`);
+  const url = new URL(`https://graph.instagram.com/v21.0/${commentId}/replies`);
   url.searchParams.append("access_token", getAccessToken() || "");
 
   const payload = { message };
@@ -34,7 +36,9 @@ export async function replyToComment(commentId: string, message: string) {
     body: JSON.stringify(payload)
   });
 
-  return response.json();
+  const data = await response.json();
+  if (data.error) console.error("Instagram Reply Error for comment", commentId, ":", data.error);
+  return data;
 }
 
 export async function getAccountMedia() {
