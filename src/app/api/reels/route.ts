@@ -5,7 +5,7 @@ import { getAllConfigs } from "@/lib/configManager";
 export async function GET() {
   try {
     const mediaItems = await getAccountMedia();
-    const configs = getAllConfigs();
+    const configs = await getAllConfigs();
     
     const reels = [];
     for (const item of mediaItems) {

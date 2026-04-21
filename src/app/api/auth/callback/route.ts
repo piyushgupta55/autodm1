@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 4. Save to config
-    updateAuthConfig(longToken, igId);
+    await updateAuthConfig(longToken, igId);
 
     return NextResponse.redirect(new URL("/settings?success=connected", req.url));
   } catch (error) {

@@ -2,8 +2,8 @@ import { getAllConfigs } from "./configManager";
 
 const GRAPH_API_URL = "https://graph.instagram.com";
 
-function getAccessToken() {
-  const config = getAllConfigs();
+async function getAccessToken() {
+  const config = await getAllConfigs();
   if (config.is_disconnected) return undefined;
   return config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN;
 }
@@ -37,7 +37,8 @@ export async function getInstagramBusinessAccount(accessToken: string) {
 
 export async function sendDm(commentId: string, message: string) {
   const url = new URL(`${GRAPH_API_URL}/me/messages`);
-  url.searchParams.append("access_token", getAccessToken() || "");
+  const accessToken = await getAccessToken();
+  url.searchParams.append("access_token", accessToken || "");
 
   const payload = {
     recipient: { comment_id: commentId },
@@ -60,7 +61,8 @@ export async function replyToComment(commentId: string, message: string) {
   
   const payload = new URLSearchParams();
   payload.append('message', message);
-  payload.append('access_token', getAccessToken() || "");
+  const accessToken = await getAccessToken();
+  payload.append('access_token', accessToken || "");
 
   const response = await fetch(url.toString(), {
     method: "POST",
@@ -75,7 +77,8 @@ export async function replyToComment(commentId: string, message: string) {
 
 export async function getAccountMedia() {
   const url = new URL(`${GRAPH_API_URL}/me/media`);
-  url.searchParams.append("access_token", getAccessToken() || "");
+  const accessToken = await getAccessToken();
+  url.searchParams.append("access_token", accessToken || "");
   url.searchParams.append("fields", "id,media_type,media_url,thumbnail_url,permalink,caption");
   url.searchParams.append("limit", "100");
 
@@ -91,9 +94,9 @@ export async function getAccountMedia() {
 }
 
 export async function getAccountProfile() {
-  const config = getAllConfigs();
+  const config = await getAllConfigs();
   const businessId = config.instagram_business_id || process.env.INSTAGRAM_BUSINESS_ID;
-  const accessToken = getAccessToken();
+  const accessToken = await getAccessToken();
 
   if (!businessId || !accessToken) {
     console.warn("Missing businessId or accessToken for profile fetch");

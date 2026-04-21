@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
           if (!commentId || !mediaId) continue;
 
-          const config = getReelConfig(mediaId);
+          const config = await getReelConfig(mediaId);
 
           if (!config.active) continue;
 

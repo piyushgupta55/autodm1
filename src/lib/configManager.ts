@@ -1,7 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-
-const CONFIG_FILE = path.join('/tmp', 'reels_config.json');
+import { createClient } from './supabase/server';
 
 export type ReelConfig = {
   trigger_keyword: string;
@@ -18,70 +15,95 @@ export type AppConfig = {
   is_disconnected?: boolean;
 };
 
-const DEFAULT_CONFIG: AppConfig = {
-  reels: {},
-  default: {
-    trigger_keyword: "info",
-    dm_message: "Thanks for your interest! Check your DMs.",
-    comment_reply: "Sent you a DM!",
-    active: true
-  }
-};
+export async function getAllConfigs(): Promise<AppConfig> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('app_config')
+    .select('*')
+    .eq('id', 'main')
+    .single();
 
-function loadConfig(): AppConfig {
-  if (!fs.existsSync(CONFIG_FILE)) {
-    try {
-      saveConfig(DEFAULT_CONFIG);
-    } catch (e) {
-      console.warn("Could not write initial config (read-only filesystem?)", e);
-    }
-    return DEFAULT_CONFIG;
+  if (error || !data) {
+    console.error("Error fetching config from Supabase:", error);
+    return {
+      reels: {},
+      default: {
+        trigger_keyword: "info",
+        dm_message: "Thanks for your interest! Check your DMs.",
+        comment_reply: "Sent you a DM!",
+        active: true
+      }
+    };
   }
-  try {
-    const data = fs.readFileSync(CONFIG_FILE, 'utf-8');
-    return JSON.parse(data) as AppConfig;
-  } catch (e) {
-    console.error("Error reading config", e);
-    return DEFAULT_CONFIG;
-  }
+
+  // The 'config' column stores { reels, default }
+  const jsonConfig = data.config || {};
+
+  return {
+    reels: jsonConfig.reels || {},
+    default: jsonConfig.default || {
+      trigger_keyword: "info",
+      dm_message: "Thanks for your interest! Check your DMs.",
+      comment_reply: "Sent you a DM!",
+      active: true
+    },
+    instagram_access_token: data.instagram_access_token,
+    instagram_business_id: data.instagram_business_id,
+    is_disconnected: data.is_disconnected
+  };
 }
 
-function saveConfig(config: AppConfig) {
-  try {
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
-  } catch (e) {
-    console.warn("Failed to save config, running in read-only environment?", e);
-  }
-}
-
-export function getAllConfigs(): AppConfig {
-  return loadConfig();
-}
-
-export function getReelConfig(mediaId: string): ReelConfig {
-  const config = loadConfig();
+export async function getReelConfig(mediaId: string): Promise<ReelConfig> {
+  const config = await getAllConfigs();
   return config.reels[mediaId] || config.default;
 }
 
-export function updateReelConfig(mediaId: string, newConfig: ReelConfig): ReelConfig {
-  const config = loadConfig();
-  config.reels[mediaId] = newConfig;
-  saveConfig(config);
+export async function updateReelConfig(mediaId: string, newConfig: ReelConfig): Promise<ReelConfig> {
+  const config = await getAllConfigs();
+  const updatedReels = { ...config.reels, [mediaId]: newConfig };
+  
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('app_config')
+    .update({ 
+      config: { 
+        reels: updatedReels, 
+        default: config.default 
+      },
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 'main');
+
+  if (error) console.error("Error updating reel config:", error);
   return newConfig;
 }
 
-export function updateAuthConfig(token: string, businessId: string) {
-  const config = loadConfig();
-  config.instagram_access_token = token;
-  config.instagram_business_id = businessId;
-  config.is_disconnected = false;
-  saveConfig(config);
+export async function updateAuthConfig(token: string, businessId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('app_config')
+    .update({
+      instagram_access_token: token,
+      instagram_business_id: businessId,
+      is_disconnected: false,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 'main');
+
+  if (error) console.error("Error updating auth config:", error);
 }
 
-export function clearAuthConfig() {
-  const config = loadConfig();
-  delete config.instagram_access_token;
-  delete config.instagram_business_id;
-  config.is_disconnected = true;
-  saveConfig(config);
+export async function clearAuthConfig() {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('app_config')
+    .update({
+      instagram_access_token: null,
+      instagram_business_id: null,
+      is_disconnected: true,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 'main');
+
+  if (error) console.error("Error clearing auth config:", error);
 }
