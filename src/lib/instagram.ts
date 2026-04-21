@@ -95,7 +95,7 @@ export async function getAccountMedia() {
 
 export async function getAccountProfile() {
   const config = await getAllConfigs();
-  const businessId = config.instagram_business_id || process.env.INSTAGRAM_BUSINESS_ID;
+  const businessId = config.instagram_business_id || process.env.IG_BUSINESS_ACCOUNT_ID;
   const accessToken = await getAccessToken();
 
   if (!businessId || !accessToken) {
