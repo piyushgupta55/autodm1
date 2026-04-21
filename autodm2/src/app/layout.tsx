@@ -3,8 +3,8 @@ import './globals.css'
 import LayoutClient from '@/components/LayoutClient'
 
 export const metadata: Metadata = {
-  title: 'InstaAuto - Instagram Automation',
-  description: 'Manage Instagram comment-to-DM automation with ease.',
+  title: 'AutoDM | Turn Instagram comments into conversations',
+  description: 'Automatically send direct messages when someone comments on your posts. Convert engagement into real conversations instantly.',
 }
 
 export default function RootLayout({
@@ -22,4 +22,3 @@ export default function RootLayout({
     </html>
   )
 }
-

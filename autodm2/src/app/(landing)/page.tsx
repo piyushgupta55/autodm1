@@ -1,10 +1,10 @@
-import Scrollytelling from "@/components/Scrollytelling";
-import Problem from "@/components/Problem";
-import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
-import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
-import FinalCTA from "@/components/FinalCTA";
+import Scrollytelling from "@/components/landing/Scrollytelling";
+import Problem from "@/components/landing/Problem";
+import Features from "@/components/landing/Features";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Pricing from "@/components/landing/Pricing";
+import FAQ from "@/components/landing/FAQ";
+import FinalCTA from "@/components/landing/FinalCTA";
 
 export default function Home() {
   return (

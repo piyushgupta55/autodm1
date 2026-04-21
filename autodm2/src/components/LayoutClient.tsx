@@ -12,7 +12,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   // The PRD says /login, /signup, /dashboard.
   
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen">
       {!isAuthPage && <Sidebar />}
       <main className={`flex-1 transition-all ${!isAuthPage ? 'pl-64' : ''}`}>
         {children}
