@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { 
   Camera, 
@@ -23,7 +24,7 @@ export default function SignupPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const router = useRouter();
-  const supabase = createClient();
+
 
   const handleSignUp = async () => {
     setIsLoading(true);
@@ -31,6 +32,7 @@ export default function SignupPage() {
     setSuccess(null);
     
     // Pass full_name to Supabase user metadata
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({ 
       email, 
       password,

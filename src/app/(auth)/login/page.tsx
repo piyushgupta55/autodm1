@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { 
   Camera, 
@@ -20,11 +21,12 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   
   const router = useRouter();
-  const supabase = createClient();
+
 
   const handleLogin = async () => {
     setIsLoading(true);
     setError(null);
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
