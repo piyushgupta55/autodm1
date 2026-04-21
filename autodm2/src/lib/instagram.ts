@@ -1,0 +1,55 @@
+const GRAPH_API_URL = "https://graph.instagram.com";
+
+function getAccessToken() {
+  return process.env.INSTAGRAM_ACCESS_TOKEN;
+}
+
+export async function sendDm(commentId: string, message: string) {
+  const url = new URL(`${GRAPH_API_URL}/me/messages`);
+  url.searchParams.append("access_token", getAccessToken() || "");
+
+  const payload = {
+    recipient: { comment_id: commentId },
+    message: { text: message }
+  };
+
+  const response = await fetch(url.toString(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  return response.json();
+}
+
+export async function replyToComment(commentId: string, message: string) {
+  const url = new URL(`${GRAPH_API_URL}/${commentId}/replies`);
+  url.searchParams.append("access_token", getAccessToken() || "");
+
+  const payload = { message };
+
+  const response = await fetch(url.toString(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  return response.json();
+}
+
+export async function getAccountMedia() {
+  const url = new URL(`${GRAPH_API_URL}/me/media`);
+  url.searchParams.append("access_token", getAccessToken() || "");
+  url.searchParams.append("fields", "id,media_type,media_url,thumbnail_url,permalink,caption");
+  url.searchParams.append("limit", "100");
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+
+  if (data.error) {
+    console.error(`Instagram API Error:`, data.error);
+    return [];
+  }
+
+  return data.data || [];
+}
