@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-
-const CONFIG_FILE = path.join(process.cwd(), 'reels_config.json');
+const CONFIG_FILE = path.join('/tmp', 'reels_config.json');
 
 export type ReelConfig = {
   trigger_keyword: string;
@@ -28,7 +27,11 @@ const DEFAULT_CONFIG: AppConfig = {
 
 function loadConfig(): AppConfig {
   if (!fs.existsSync(CONFIG_FILE)) {
-    saveConfig(DEFAULT_CONFIG);
+    try {
+      saveConfig(DEFAULT_CONFIG);
+    } catch (e) {
+      console.warn("Could not write initial config (read-only filesystem?)", e);
+    }
     return DEFAULT_CONFIG;
   }
   try {
@@ -41,7 +44,11 @@ function loadConfig(): AppConfig {
 }
 
 function saveConfig(config: AppConfig) {
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+  try {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn("Failed to save config, running in read-only environment?", e);
+  }
 }
 
 export function getAllConfigs(): AppConfig {
