@@ -5,27 +5,20 @@ import { motion } from 'framer-motion';
 
 const plans = [
   { 
-    name: 'Starter', 
+    name: 'Unlimited Access', 
     price: '$0', 
-    desc: 'Perfect for new creators.',
-    features: ['100 Automations/mo', 'Basic Analytics', 'Standard Support', '1 IG Account'],
-    current: true
-  },
-  { 
-    name: 'Pro', 
-    price: '$29', 
-    desc: 'For growing businesses.',
-    features: ['Unlimited Automations', 'Advanced Analytics', 'Priority Support', '3 IG Accounts', 'AI Suggestions'],
-    current: false,
+    desc: 'Everything unlocked. Forever.',
+    features: [
+      'Unlimited Automated DMs', 
+      'Advanced AI Triggers', 
+      'Full Analytics Dashboard', 
+      'Multi-Account Support', 
+      'Priority Lead Routing',
+      'Lifetime Updates'
+    ],
+    current: true,
     popular: true
-  },
-  { 
-    name: 'Agency', 
-    price: '$99', 
-    desc: 'For management teams.',
-    features: ['Unlimited Everything', 'Custom Webhooks', 'Team Access', '10 IG Accounts', 'White-labeling'],
-    current: false
-  },
+  }
 ];
 
 export default function BillingPage() {
@@ -37,25 +30,24 @@ export default function BillingPage() {
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="flex justify-center">
         {plans.map((plan, i) => (
           <motion.div 
             key={plan.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`card flex flex-col relative ${plan.popular ? 'border-brand ring-1 ring-brand' : ''}`}
+            className="card flex flex-col relative border-brand ring-1 ring-brand max-w-md w-full"
           >
-            {plan.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
-                Most Popular
-              </div>
-            )}
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+              Lifetime Access
+            </div>
+            
             <div className="mb-8">
               <h3 className="text-xl font-bold text-accent">{plan.name}</h3>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-4xl font-bold text-accent">{plan.price}</span>
-                <span className="text-gray-400 text-sm">/month</span>
+                <span className="text-gray-400 text-sm">/ Forever</span>
               </div>
               <p className="text-sm text-gray-500 mt-4">{plan.desc}</p>
             </div>
@@ -71,11 +63,14 @@ export default function BillingPage() {
               ))}
             </ul>
 
-            <button className={`w-full py-4 rounded-xl font-bold transition-all ${
-              plan.current ? 'bg-secondary text-gray-400 cursor-not-allowed' : 'btn-primary'
-            }`}>
-              {plan.current ? 'Current Plan' : 'Upgrade Now'}
-            </button>
+            <a 
+              href="https://www.instagram.com/freelancewith.piyush/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 rounded-xl font-bold transition-all btn-primary flex items-center justify-center gap-2"
+            >
+              Follow to Unlock <Zap className="w-4 h-4 fill-current" />
+            </a>
           </motion.div>
         ))}
       </div>
