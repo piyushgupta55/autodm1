@@ -15,7 +15,7 @@ import {
 import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
-  const [profile, setProfile] = useState<{ name: string; username: string } | null>(null);
+  const [profile, setProfile] = useState<{ name: string; username: string; profile_picture_url?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +53,13 @@ export default function SettingsPage() {
           <div className="flex items-center gap-6">
             <div className="relative group cursor-pointer">
               <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-soft group-hover:opacity-80 transition-all">
-                <User className="w-10 h-10 text-gray-400" />
+                {profile?.profile_picture_url ? (
+                  <img src={profile.profile_picture_url} className="w-full h-full object-cover" alt="profile" />
+                ) : profile?.username ? (
+                  <img src={`https://unavatar.io/instagram/${profile.username}`} className="w-full h-full object-cover" alt="profile" />
+                ) : (
+                  <User className="w-10 h-10 text-gray-400" />
+                )}
               </div>
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                 <Camera className="w-6 h-6 text-white" />
