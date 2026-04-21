@@ -67,7 +67,13 @@ export default function Navbar() {
         </div>
 
         {/* Right - CTA */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-6">
+          <Link 
+            href="/login" 
+            className="text-sm text-[rgba(255,255,255,0.6)] hover:text-white transition-colors duration-200"
+          >
+            Login
+          </Link>
           <button className="h-9 px-4 rounded-full bg-white text-black font-medium text-sm hover:scale-105 active:scale-95 transition-all duration-200 shadow-[0_0_20px_rgba(255,255,255,0.15)] glow-button">
             Get Unlimited
           </button>
