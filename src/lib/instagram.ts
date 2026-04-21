@@ -94,19 +94,17 @@ export async function getAccountMedia() {
 }
 
 export async function getAccountProfile() {
-  const config = await getAllConfigs();
-  const businessId = config.instagram_business_id || process.env.IG_BUSINESS_ACCOUNT_ID;
   const accessToken = await getAccessToken();
 
-  if (!businessId || !accessToken) {
-    console.warn("Missing businessId or accessToken for profile fetch");
+  if (!accessToken) {
+    console.warn("No access token available");
     return null;
   }
 
-  // Use the Facebook Graph API to get IG Business Account details
-  const url = new URL(`https://graph.facebook.com/v21.0/${businessId}`);
+  // IGAAR tokens work with graph.instagram.com/me
+  const url = new URL(`https://graph.instagram.com/v21.0/me`);
   url.searchParams.append("access_token", accessToken);
-  url.searchParams.append("fields", "id,username,name,profile_picture_url");
+  url.searchParams.append("fields", "id,username,name");
 
   const response = await fetch(url.toString());
   const data = await response.json();
@@ -118,3 +116,4 @@ export async function getAccountProfile() {
 
   return data;
 }
+

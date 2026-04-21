@@ -16,7 +16,7 @@ export async function GET() {
     // Try a live call to Instagram Graph API
     let igApiResult = null;
     if (hasToken && hasBusinessId) {
-      const url = new URL(`https://graph.facebook.com/v21.0/${businessId}`);
+      const url = new URL(`https://graph.instagram.com/v21.0/me`);
       url.searchParams.append("access_token", config.instagram_access_token!);
       url.searchParams.append("fields", "id,username,name");
       const res = await fetch(url.toString());
