@@ -16,17 +16,14 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 const stats = [
-  { label: 'Total Sent', value: '12,842', change: '+12%', icon: Send },
-  { label: 'New Followers', value: '1,420', change: '+18%', icon: Users },
-  { label: 'Reply Rate', value: '64%', change: '+5%', icon: MessageCircle },
-  { label: 'Growth', value: '2.4k', change: '+24%', icon: TrendingUp },
+  { label: 'Total Sent', value: '0', change: '0%', icon: Send },
+  { label: 'New Followers', value: '0', change: '0%', icon: Users },
+  { label: 'Reply Rate', value: '0%', change: '0%', icon: MessageCircle },
+  { label: 'Growth', value: '0', change: '0%', icon: TrendingUp },
 ];
 
-const recentActivity = [
-  { user: 'sarah_j', action: 'Replied to story', time: '2m ago' },
-  { user: 'mike.dev', action: 'Triggered automation "Ebook"', time: '15m ago' },
-  { user: 'alex_growth', action: 'New follower DM sent', time: '1h ago' },
-  { user: 'design_daily', action: 'Replied to comment', time: '3h ago' },
+const recentActivity: any[] = [
+  // Activity will be populated securely from your database later
 ];
 
 export default function Dashboard() {
