@@ -25,15 +25,16 @@ export async function sendDm(commentId: string, message: string) {
 }
 
 export async function replyToComment(commentId: string, message: string) {
-  const url = new URL(`https://graph.instagram.com/v21.0/${commentId}/replies`);
-  url.searchParams.append("access_token", getAccessToken() || "");
-
-  const payload = { message };
+  const url = new URL(`https://graph.facebook.com/v21.0/${commentId}/replies`);
+  
+  const payload = new URLSearchParams();
+  payload.append('message', message);
+  payload.append('access_token', getAccessToken() || "");
 
   const response = await fetch(url.toString(), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: payload
   });
 
   const data = await response.json();
