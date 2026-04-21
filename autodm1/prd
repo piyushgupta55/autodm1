@@ -1,0 +1,196 @@
+📄 PRODUCT REQUIREMENT DOCUMENT (PRD)
+Product: Insta Auto DM Frontend
+1. 🎯 Goal
+
+Build a clean, minimal, white-themed web app where users can:
+
+Connect their Instagram
+Set up automated DMs
+Manage conversations and campaigns
+Track performance
+
+Focus: simple UI, fast actions, no clutter
+
+2. 👤 Target Users
+Creators (Reels/Content creators)
+Small businesses
+Agencies managing multiple accounts
+3. 🎨 Design Direction (IMPORTANT)
+Primary color: White (#FFFFFF)
+Accent: Black / Dark Gray (#111 / #333)
+Secondary: Soft Gray (#F5F5F5)
+Highlight: Blue (#3B82F6) or Purple (#7C3AED)
+UI Style:
+Clean cards
+Rounded corners (12px–16px)
+Soft shadows
+Lots of spacing
+Minimal text
+4. 🧩 CORE PAGES (Step-by-Step)
+4.1 🔐 Auth Pages
+
+Pages:
+
+Login
+Signup
+
+Features:
+
+Email + password
+“Continue with Instagram” (main CTA)
+Forgot password
+4.2 🏠 Dashboard (Main Screen)
+
+Purpose: Quick overview
+
+Sections:
+
+Connected account info
+Active automations
+Messages sent today
+Growth stats
+
+Components:
+
+Stat cards
+Recent activity
+Quick actions:
+➕ Create Automation
+📩 View Messages
+4.3 🤖 Automation Builder (CORE FEATURE)
+
+This is your main money feature.
+
+Page Type: Form + Preview
+
+Features:
+
+Trigger selection:
+Comment on post
+New follower
+Keyword in DM
+Message input (with variables like {name})
+Delay settings (optional)
+CTA buttons (links)
+
+UI Blocks:
+
+Left: Settings
+Right: Live preview (Instagram-style chat UI)
+4.4 📋 Automation List Page
+
+Purpose: Manage all automations
+
+Features:
+
+List view (cards or table)
+Toggle ON/OFF
+Edit / Delete
+Status (Active / Paused)
+4.5 💬 Messages / Inbox
+
+Purpose: View conversations
+
+Features:
+
+Chat list (left sidebar)
+Chat window (right)
+Search users
+Filters:
+Unread
+Replied
+Automated
+4.6 📊 Analytics Page
+
+Purpose: Show performance
+
+Metrics:
+
+Messages sent
+Open rate
+Reply rate
+Conversion clicks
+
+UI:
+
+Graphs
+Daily/weekly toggle
+Campaign-wise breakdown
+4.7 👤 Account Settings
+
+Sections:
+
+Profile info
+Connected Instagram account
+Logout
+Notifications
+4.8 🔌 Integrations (Optional but powerful)
+
+Future-ready page
+
+Integrations:
+
+Zapier
+Webhooks
+Email tools
+4.9 💳 Billing (If SaaS)
+
+Features:
+
+Plan selection
+Usage limits
+Upgrade/downgrade
+5. 🧱 COMPONENTS YOU’LL NEED
+Reusable Components:
+Navbar (top)
+Sidebar (left)
+Card UI
+Buttons (Primary / Secondary)
+Input fields
+Toggle switch
+Modal (for create/edit)
+Toast notifications
+6. 🔄 USER FLOW
+Flow 1: New User
+Signup
+Connect Instagram
+Go to Dashboard
+Create Automation
+Activate
+Flow 2: Daily Use
+Open Dashboard
+Check stats
+View messages
+Optimize automation
+7. ⚡ MUST-HAVE FEATURES (MVP)
+Instagram connect
+Automation builder
+Automation toggle ON/OFF
+Basic analytics
+Message inbox
+8. 🚀 NICE-TO-HAVE (PHASE 2)
+AI message suggestions
+A/B testing
+Bulk campaigns
+Multi-account support
+Templates marketplace
+9. 🧠 UX RULES (VERY IMPORTANT)
+Keep forms short
+Show preview everywhere
+Avoid too many clicks
+Use icons + minimal text
+Everything should feel fast
+10. 🛠️ TECH SUGGESTION (for you)
+
+Since you're already using React:
+
+11. 📌 SIMPLE PAGE STRUCTURE
+/login
+/signup
+/dashboard
+/automations
+/automations/create
+/messages
+/analytics
+/settings
+/billing
