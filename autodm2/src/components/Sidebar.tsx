@@ -10,8 +10,10 @@ import {
   Settings, 
   CreditCard, 
   Zap,
-  User
+  User,
+  Loader
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -25,6 +27,22 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [profile, setProfile] = useState<{ name: string; username: string } | null>(null);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setProfile(data);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    loadProfile();
+  }, []);
 
   return (
     <aside className="w-64 h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0">
@@ -63,8 +81,12 @@ export default function Sidebar() {
             <User className="text-gray-500 w-5 h-5" />
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium text-accent truncate">Tejas Adhiya</p>
-            <p className="text-xs text-gray-400 truncate">Free Plan</p>
+            <p className="text-sm font-medium text-accent truncate">
+              {profile?.name || 'Loading...'}
+            </p>
+            <p className="text-xs text-gray-400 truncate">
+              {profile?.username ? `@${profile.username}` : 'Pro Plan'}
+            </p>
           </div>
         </div>
       </div>

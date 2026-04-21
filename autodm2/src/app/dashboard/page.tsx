@@ -34,28 +34,29 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // 1. Verify user is logged in
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
-        return;
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const profile = await res.json();
+          if (profile.username) {
+            setIntegrations([
+              {
+                instagram_username: profile.username,
+                is_integration_broken: false,
+                auto_dm_count: 0
+              }
+            ]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard integrations", err);
+      } finally {
+        setIsLoading(false);
       }
-
-      // 2. Query our newly created Integrations table
-      const { data, error } = await supabase
-        .from('integrations')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (data) {
-        setIntegrations(data);
-      }
-      setIsLoading(false);
     };
 
     fetchDashboardData();
-  }, [router, supabase]);
+  }, []);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 animate-slideIn">
@@ -66,11 +67,11 @@ export default function Dashboard() {
           <p className="text-gray-500 mt-1">Welcome back! Here's what's happening today.</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn-secondary flex items-center gap-2">
+          <button className="btn-secondary flex items-center gap-2" onClick={() => router.push('/settings')}>
             <Camera className="w-5 h-5" />
             Connect Account
           </button>
-          <button className="btn-primary flex items-center gap-2">
+          <button className="btn-primary flex items-center gap-2" onClick={() => router.push('/automations')}>
             <Plus className="w-5 h-5" />
             Create Automation
           </button>
