@@ -107,14 +107,35 @@ export default function SettingsPage() {
             </div>
             <div>
               <p className="font-bold text-accent">
-                {loading ? 'Connecting...' : profile?.username ? `@${profile.username}` : 'Not Connected'}
+                {loading ? 'Checking...' : profile?.username ? `@${profile.username}` : 'Not Connected'}
               </p>
-              <p className="text-xs text-green-500 font-medium">Successfully Connected • Business Account</p>
+              {profile?.username ? (
+                <p className="text-xs text-green-500 font-medium">Successfully Connected • Business Account</p>
+              ) : (
+                <p className="text-xs text-gray-400 font-medium">Link your account to start automating DMs.</p>
+              )}
             </div>
           </div>
-          <button className="btn-secondary py-2 text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100">
-            Disconnect Account
-          </button>
+          {profile?.username ? (
+            <button 
+              onClick={async () => {
+                if (confirm('Are you sure you want to disconnect?')) {
+                  await fetch('/api/auth/disconnect', { method: 'POST' });
+                  window.location.reload();
+                }
+              }}
+              className="btn-secondary py-2 text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100"
+            >
+              Disconnect Account
+            </button>
+          ) : (
+            <button 
+              onClick={() => window.location.href = '/api/auth/facebook'}
+              className="btn-primary py-2 px-6"
+            >
+              Connect with Facebook
+            </button>
+          )}
         </div>
       </section>
 

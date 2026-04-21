@@ -13,6 +13,8 @@ export type ReelConfig = {
 export type AppConfig = {
   reels: Record<string, ReelConfig>;
   default: ReelConfig;
+  instagram_access_token?: string;
+  instagram_business_id?: string;
 };
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -65,4 +67,18 @@ export function updateReelConfig(mediaId: string, newConfig: ReelConfig): ReelCo
   config.reels[mediaId] = newConfig;
   saveConfig(config);
   return newConfig;
+}
+
+export function updateAuthConfig(token: string, businessId: string) {
+  const config = loadConfig();
+  config.instagram_access_token = token;
+  config.instagram_business_id = businessId;
+  saveConfig(config);
+}
+
+export function clearAuthConfig() {
+  const config = loadConfig();
+  delete config.instagram_access_token;
+  delete config.instagram_business_id;
+  saveConfig(config);
 }

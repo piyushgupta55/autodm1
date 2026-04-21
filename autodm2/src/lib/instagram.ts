@@ -1,7 +1,34 @@
+import { getAllConfigs } from "./configManager";
+
 const GRAPH_API_URL = "https://graph.instagram.com";
 
 function getAccessToken() {
-  return process.env.INSTAGRAM_ACCESS_TOKEN;
+  const config = getAllConfigs();
+  return config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN;
+}
+
+export async function getLongLivedToken(shortToken: string) {
+  const response = await fetch(
+    `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.NEXT_PUBLIC_FB_APP_ID}&client_secret=${process.env.FB_APP_SECRET}&fb_exchange_token=${shortToken}`
+  );
+  return response.json();
+}
+
+export async function getInstagramBusinessAccount(accessToken: string) {
+  // 1. Get pages
+  const pagesRes = await fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`);
+  const pagesData = await pagesRes.json();
+  const pages = pagesData.data || [];
+
+  for (const page of pages) {
+    // 2. For each page, check for linked IG business account
+    const igRes = await fetch(`https://graph.facebook.com/v21.0/${page.id}?fields=instagram_business_account&access_token=${accessToken}`);
+    const igData = await igRes.json();
+    if (igData.instagram_business_account) {
+      return igData.instagram_business_account.id;
+    }
+  }
+  return null;
 }
 
 export async function sendDm(commentId: string, message: string) {
