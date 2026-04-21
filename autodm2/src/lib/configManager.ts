@@ -15,6 +15,7 @@ export type AppConfig = {
   default: ReelConfig;
   instagram_access_token?: string;
   instagram_business_id?: string;
+  is_disconnected?: boolean;
 };
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -73,6 +74,7 @@ export function updateAuthConfig(token: string, businessId: string) {
   const config = loadConfig();
   config.instagram_access_token = token;
   config.instagram_business_id = businessId;
+  config.is_disconnected = false;
   saveConfig(config);
 }
 
@@ -80,5 +82,6 @@ export function clearAuthConfig() {
   const config = loadConfig();
   delete config.instagram_access_token;
   delete config.instagram_business_id;
+  config.is_disconnected = true;
   saveConfig(config);
 }

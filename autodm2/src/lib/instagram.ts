@@ -4,6 +4,7 @@ const GRAPH_API_URL = "https://graph.instagram.com";
 
 function getAccessToken() {
   const config = getAllConfigs();
+  if (config.is_disconnected) return undefined;
   return config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN;
 }
 
