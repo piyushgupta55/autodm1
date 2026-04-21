@@ -14,6 +14,7 @@ import {
   Loader
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { InstagramProfile } from '@/types/instagram';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -27,7 +28,7 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [profile, setProfile] = useState<{ name: string; username: string } | null>(null);
+  const [profile, setProfile] = useState<InstagramProfile | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
