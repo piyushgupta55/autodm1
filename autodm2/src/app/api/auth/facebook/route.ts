@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req: any) {
-  const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+  const appId = process.env.NEXT_PUBLIC_FB_APP_ID || "959311050110497";
   const protocol = req.headers.get("x-forwarded-proto") || "http";
   const host = req.headers.get("host");
   const redirectUri = encodeURIComponent(`${protocol}://${host}/api/auth/callback`);

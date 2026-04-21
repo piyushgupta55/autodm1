@@ -14,10 +14,12 @@ export async function GET(req: NextRequest) {
     const protocol = req.headers.get("x-forwarded-proto") || "http";
     const host = req.headers.get("host");
     const redirectUri = `${protocol}://${host}/api/auth/callback`;
+    const appId = process.env.NEXT_PUBLIC_FB_APP_ID || "959311050110497";
+    const appSecret = process.env.FB_APP_SECRET || "943046142641ebaa6565cdca2cc738c1";
 
     // 1. Exchange code for short-lived token
     const tokenRes = await fetch(
-      `https://graph.facebook.com/v21.0/oauth/access_token?client_id=${process.env.NEXT_PUBLIC_FB_APP_ID}&redirect_uri=${redirectUri}&client_secret=${process.env.FB_APP_SECRET}&code=${code}`
+      `https://graph.facebook.com/v21.0/oauth/access_token?client_id=${appId}&redirect_uri=${redirectUri}&client_secret=${appSecret}&code=${code}`
     );
     const tokenData = await tokenRes.json();
     const shortToken = tokenData.access_token;
