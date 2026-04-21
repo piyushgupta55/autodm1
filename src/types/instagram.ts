@@ -28,3 +28,10 @@ export interface ApiResponse<T> {
   data: T;
   status: boolean;
 }
+
+export interface InstagramProfile {
+  id: string;
+  username: string;
+  name: string;
+  profile_picture_url?: string;
+}

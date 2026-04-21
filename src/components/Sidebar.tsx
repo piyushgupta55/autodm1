@@ -77,11 +77,13 @@ export default function Sidebar() {
 
       <div className="p-4 mt-auto border-t border-gray-100">
         <div className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-secondary rounded-xl transition-all">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-            {profile?.username ? (
-               <img src={`https://unavatar.io/instagram/${profile.username}`} className="w-full h-full rounded-full object-cover" alt="" />
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+            {profile?.profile_picture_url ? (
+               <img src={profile.profile_picture_url} className="w-full h-full object-cover" alt="" />
+            ) : profile?.username ? (
+               <img src={`https://unavatar.io/instagram/${profile.username}`} className="w-full h-full object-cover" alt="" />
             ) : (
-               <User className="text-gray-500 w-5 h-5" />
+               <User className="text-gray-400 w-5 h-5" />
             )}
           </div>
           <div className="flex-1 overflow-hidden">
