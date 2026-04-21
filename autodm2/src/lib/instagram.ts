@@ -53,3 +53,19 @@ export async function getAccountMedia() {
 
   return data.data || [];
 }
+
+export async function getAccountProfile() {
+  const url = new URL(`https://graph.instagram.com/v21.0/me`);
+  url.searchParams.append("access_token", getAccessToken() || "");
+  url.searchParams.append("fields", "id,username,name");
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+
+  if (data.error) {
+    console.error(`Instagram API Error:`, data.error);
+    return null;
+  }
+
+  return data;
+}

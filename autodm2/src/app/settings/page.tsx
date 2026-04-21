@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { 
   User, 
   Camera, 
@@ -8,11 +9,32 @@ import {
   LogOut,
   ChevronRight,
   Globe,
-  Mail
+  Mail,
+  Loader
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
+  const [profile, setProfile] = useState<{ name: string; username: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setProfile(data);
+        }
+      } catch (e) {
+        console.error("Failed to load profile:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProfile();
+  }, []);
+
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-12 animate-slideIn pb-20">
       <div>
@@ -38,8 +60,12 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-lg text-accent">Tejas Adhiya</h3>
-              <p className="text-sm text-gray-400">tejas@instaauto.com</p>
+              <h3 className="font-bold text-lg text-accent">
+                {loading ? <Loader className="w-5 h-5 animate-spin" /> : profile?.name || 'Loading...'}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {profile?.username ? `@${profile.username}` : 'No username'}
+              </p>
               <button className="text-xs font-bold text-brand hover:underline mt-2">Change Avatar</button>
             </div>
           </div>
@@ -47,11 +73,11 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-accent uppercase tracking-widest ml-1">Display Name</label>
-              <input type="text" defaultValue="Tejas Adhiya" className="input" />
+              <input type="text" value={profile?.name || ''} readOnly className="input bg-gray-50" />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-accent uppercase tracking-widest ml-1">Email Address</label>
-              <input type="email" defaultValue="tejas@instaauto.com" className="input" />
+              <label className="text-xs font-bold text-accent uppercase tracking-widest ml-1">Instagram Username</label>
+              <input type="text" value={profile?.username ? `@${profile.username}` : ''} readOnly className="input bg-gray-50" />
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-accent uppercase tracking-widest ml-1">Website</label>
@@ -80,7 +106,9 @@ export default function SettingsPage() {
               <Camera className="text-[#E1306C] w-6 h-6" />
             </div>
             <div>
-              <p className="font-bold text-accent">@tejas_codes</p>
+              <p className="font-bold text-accent">
+                {loading ? 'Connecting...' : profile?.username ? `@${profile.username}` : 'Not Connected'}
+              </p>
               <p className="text-xs text-green-500 font-medium">Successfully Connected • Business Account</p>
             </div>
           </div>
