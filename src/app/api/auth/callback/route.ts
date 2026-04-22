@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
     const protocol = req.headers.get("x-forwarded-proto") || "http";
     const host = req.headers.get("host");
     const redirectUri = `${protocol}://${host}/api/auth/callback`;
-    const appId = process.env.NEXT_PUBLIC_FB_APP_ID || "959311050110497";
-    const appSecret = process.env.FB_APP_SECRET || "943046142641ebaa6565cdca2cc738c1";
+  const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+  const appSecret = process.env.FB_APP_SECRET;
 
     // 1. Exchange code for short-lived token
     const tokenRes = await fetch(
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     // 4. Save to config
     await updateAuthConfig(longToken, igId);
 
-    return NextResponse.redirect(new URL("/settings?success=connected", req.url));
+    return NextResponse.redirect(new URL("/dashboard?success=connected", req.url));
   } catch (error) {
     console.error("OAuth Callback Error", error);
     return NextResponse.redirect(new URL("/settings?error=internal", req.url));

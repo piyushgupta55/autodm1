@@ -9,8 +9,8 @@ async function getAccessToken() {
 }
 
 export async function getLongLivedToken(shortToken: string) {
-  const appId = process.env.NEXT_PUBLIC_FB_APP_ID || "959311050110497";
-  const appSecret = process.env.FB_APP_SECRET || "943046142641ebaa6565cdca2cc738c1";
+  const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+  const appSecret = process.env.FB_APP_SECRET;
   
   const response = await fetch(
     `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortToken}`
