@@ -8,9 +8,16 @@ export async function GET(req: any) {
     return `${protocol}://${host}`;
   })();
 
-  const redirectUri = encodeURIComponent(`${baseUrl}/api/auth/callback`);
+  const redirectUri = `${baseUrl}/api/auth/callback`;
   const scope = "instagram_business_basic,instagram_business_manage_comments,instagram_business_manage_messages";
-  const instaLoginUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${appId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code`;
+  const instaLoginUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
+
+  console.log("=== Instagram OAuth Debug ===");
+  console.log("App ID:", appId);
+  console.log("Base URL:", baseUrl);
+  console.log("Redirect URI:", redirectUri);
+  console.log("Full OAuth URL:", instaLoginUrl);
+  console.log("=============================");
   
   return NextResponse.redirect(instaLoginUrl);
 }
