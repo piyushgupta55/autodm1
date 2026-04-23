@@ -44,11 +44,12 @@ export async function GET(req: NextRequest) {
       `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortToken}`
     );
     const longData = await longRes.json();
+    console.log("Long token response:", JSON.stringify(longData));
     const longToken = longData.access_token;
 
     if (!longToken) {
-      console.error("Failed to get long token", longData);
-      return NextResponse.redirect(new URL("/settings?error=long_token_failed", req.url));
+      console.error("Failed to get long token", JSON.stringify(longData));
+      return NextResponse.redirect(new URL(`/settings?error=long_token_failed&detail=${encodeURIComponent(longData?.error?.message || "unknown")}`, req.url));
     }
 
     // 3. Save token + IG user ID
