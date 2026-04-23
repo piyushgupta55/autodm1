@@ -78,15 +78,9 @@ export async function replyToComment(commentId: string, message: string) {
 export async function getAccountMedia() {
   const accessToken = await getAccessToken();
 
-  const response = await fetch(`https://graph.instagram.com/v21.0/me/media`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      access_token: accessToken || "",
-      fields: "id,media_type,media_url,thumbnail_url,permalink,caption",
-      limit: "100",
-    }),
-  });
+  const response = await fetch(
+    `https://graph.instagram.com/v21.0/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption&limit=100&access_token=${accessToken || ""}`
+  );
   const data = await response.json();
 
   if (data.error) {
@@ -98,25 +92,20 @@ export async function getAccountMedia() {
 }
 
 export async function getAccountProfile() {
-  const accessToken = await getAccessToken();
+  const config = await getAllConfigs();
+  const accessToken = config.is_disconnected ? undefined : (config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN);
 
   if (!accessToken) {
     console.warn("No access token available");
     return null;
   }
 
-  // IGAAR tokens work with graph.instagram.com/me
-  const url = new URL(`https://graph.instagram.com/v21.0/me`);
-  url.searchParams.append("fields", "id,username,name");
+  const igUserId = config.instagram_business_id;
+  const endpoint = igUserId
+    ? `https://graph.instagram.com/v21.0/${igUserId}?fields=id,name,username,profile_picture_url,followers_count,biography,website&access_token=${accessToken}`
+    : `https://graph.instagram.com/v21.0/me?fields=id,name,username&access_token=${accessToken}`;
 
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      access_token: accessToken,
-      fields: "id,username,name", 
-    }),
-  });
+  const response = await fetch(endpoint);
   const data = await response.json();
 
   if (data.error) {
@@ -126,4 +115,5 @@ export async function getAccountProfile() {
 
   return data;
 }
+
 

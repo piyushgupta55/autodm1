@@ -40,12 +40,26 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/settings?error=token_failed", req.url));
     }
 
-    // For Instagram Business Login (IGAAR tokens), the token is already long-lived (60 days)
-    // No separate exchange step needed
-    const longToken = shortToken;
-    console.log("Using token directly (IGAAR tokens are long-lived)");
+    // 2. Exchange for long-lived token (60 days)
+    const longTokenRes = await fetch(
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortToken}`
+    );
+    const longTokenData = await longTokenRes.json();
+    console.log("Long-lived token response:", JSON.stringify(longTokenData));
+    const longToken = longTokenData.access_token || shortToken;
 
-    // 3. Save token + IG user ID
+    // 3. Fetch profile using igUserId
+    const profileRes = await fetch(
+      `https://graph.instagram.com/v21.0/${igUserId}?fields=id,name,username,profile_picture_url,followers_count,biography,website&access_token=${longToken}`
+    );
+    const profileData = await profileRes.json();
+    console.log("Profile data:", JSON.stringify(profileData));
+
+    if (profileData.error) {
+      console.error("Profile fetch failed:", profileData.error.message);
+    }
+
+    // 4. Save token + IG user ID
     await updateAuthConfig(longToken, String(igUserId));
 
     return NextResponse.redirect(new URL("/dashboard?success=connected", req.url));
