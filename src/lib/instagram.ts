@@ -114,7 +114,7 @@ export async function getAccountProfile() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       access_token: accessToken,
-      fields: "id,username,name",
+      fields: "id,username,name", 
     }),
   });
   const data = await response.json();
