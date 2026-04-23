@@ -12,6 +12,15 @@ export type AppConfig = {
   default: ReelConfig;
   instagram_access_token?: string;
   instagram_business_id?: string;
+  instagram_profile?: {
+    id: string;
+    name?: string;
+    username?: string;
+    profile_picture_url?: string;
+    followers_count?: number;
+    biography?: string;
+    website?: string;
+  } | null;
   is_disconnected?: boolean;
 };
 
@@ -49,6 +58,7 @@ export async function getAllConfigs(): Promise<AppConfig> {
     },
     instagram_access_token: data.instagram_access_token,
     instagram_business_id: data.instagram_business_id,
+    instagram_profile: data.instagram_profile,
     is_disconnected: data.is_disconnected
   };
 }
@@ -78,13 +88,14 @@ export async function updateReelConfig(mediaId: string, newConfig: ReelConfig): 
   return newConfig;
 }
 
-export async function updateAuthConfig(token: string, businessId: string) {
+export async function updateAuthConfig(token: string, businessId: string, profile?: object | null) {
   const supabase = await createClient();
   const { error } = await supabase
     .from('app_config')
     .update({
       instagram_access_token: token,
       instagram_business_id: businessId,
+      instagram_profile: profile || null,
       is_disconnected: false,
       updated_at: new Date().toISOString()
     })
