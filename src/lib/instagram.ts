@@ -9,11 +9,9 @@ async function getAccessToken() {
 }
 
 export async function getLongLivedToken(shortToken: string) {
-  const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
   const appSecret = process.env.FB_APP_SECRET;
-  
   const response = await fetch(
-    `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortToken}`
+    `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortToken}`
   );
   return response.json();
 }
@@ -93,23 +91,25 @@ export async function getAccountMedia() {
 
 export async function getAccountProfile() {
   const config = await getAllConfigs();
-  const accessToken = config.is_disconnected ? undefined : (config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN);
 
-  if (!accessToken) {
-    console.warn("No access token available");
+  if (!config.instagram_access_token || !config.instagram_business_id) {
+    console.warn("No token or business ID found");
     return null;
   }
 
-  const igUserId = config.instagram_business_id;
-  const endpoint = igUserId
-    ? `https://graph.instagram.com/v21.0/${igUserId}?fields=id,name,username,profile_picture_url,followers_count,biography,website&access_token=${accessToken}`
-    : `https://graph.instagram.com/v21.0/me?fields=id,name,username&access_token=${accessToken}`;
+  // Return saved profile if exists (fast path)
+  if (config.instagram_profile) {
+    return config.instagram_profile;
+  }
 
-  const response = await fetch(endpoint);
-  const data = await response.json();
+  // Fallback: fetch live from Instagram
+  const res = await fetch(
+    `https://graph.instagram.com/v21.0/${config.instagram_business_id}?fields=id,name,username,profile_picture_url,followers_count,biography,website&access_token=${config.instagram_access_token}`
+  );
+  const data = await res.json();
 
   if (data.error) {
-    console.error(`Instagram Profile API Error:`, data.error);
+    console.error("Instagram Profile API Error:", data.error);
     return null;
   }
 
