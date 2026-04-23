@@ -78,15 +78,9 @@ export async function replyToComment(commentId: string, message: string) {
 export async function getAccountMedia() {
   const accessToken = await getAccessToken();
 
-  const response = await fetch(`https://graph.instagram.com/v21.0/me/media`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      access_token: accessToken || "",
-      fields: "id,media_type,media_url,thumbnail_url,permalink,caption",
-      limit: "100",
-    }),
-  });
+  const response = await fetch(
+    `https://graph.facebook.com/v21.0/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption&limit=100&access_token=${accessToken || ""}`
+  );
   const data = await response.json();
 
   if (data.error) {
@@ -105,18 +99,10 @@ export async function getAccountProfile() {
     return null;
   }
 
-  // IGAAR tokens work with graph.instagram.com/me
-  const url = new URL(`https://graph.instagram.com/v21.0/me`);
-  url.searchParams.append("fields", "id,username,name");
-
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      access_token: accessToken,
-      fields: "id,username,name",
-    }),
-  });
+  // New Instagram Business Login API uses graph.facebook.com
+  const response = await fetch(
+    `https://graph.facebook.com/v21.0/me?fields=id,name,username&access_token=${accessToken}`
+  );
   const data = await response.json();
 
   if (data.error) {
