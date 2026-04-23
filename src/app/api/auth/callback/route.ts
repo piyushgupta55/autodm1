@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
       }
     );
     const tokenData = await tokenRes.json();
+    console.log("Short token response:", JSON.stringify(tokenData));
     const shortToken = tokenData.access_token;
     const igUserId = tokenData.user_id;
 
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     // 2. Exchange for long-lived token
     const longRes = await fetch(
-      `https://graph.instagram.com/v21.0/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortToken}`
+      `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortToken}`
     );
     const longData = await longRes.json();
     console.log("Long token response:", JSON.stringify(longData));
