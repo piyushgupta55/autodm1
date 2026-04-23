@@ -92,17 +92,20 @@ export async function getAccountMedia() {
 }
 
 export async function getAccountProfile() {
-  const accessToken = await getAccessToken();
+  const config = await getAllConfigs();
+  const accessToken = config.is_disconnected ? undefined : (config.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN);
 
   if (!accessToken) {
     console.warn("No access token available");
     return null;
   }
 
-  // New Instagram Business Login API uses graph.facebook.com
-  const response = await fetch(
-    `https://graph.facebook.com/v21.0/me?fields=id,name,username&access_token=${accessToken}`
-  );
+  const igUserId = config.instagram_business_id;
+  const endpoint = igUserId
+    ? `https://graph.facebook.com/v21.0/${igUserId}?fields=id,name,username,biography,profile_picture_url&access_token=${accessToken}`
+    : `https://graph.facebook.com/v21.0/me?fields=id,name,username,biography,profile_picture_url&access_token=${accessToken}`;
+
+  const response = await fetch(endpoint);
   const data = await response.json();
 
   if (data.error) {
@@ -112,4 +115,3 @@ export async function getAccountProfile() {
 
   return data;
 }
-
