@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getLongLivedToken, getInstagramBusinessAccount } from "@/lib/instagram";
 import { updateAuthConfig } from "@/lib/configManager";
 
 export async function GET(req: NextRequest) {
@@ -11,18 +10,29 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const protocol = req.headers.get("x-forwarded-proto") || "http";
-    const host = req.headers.get("host");
-    const redirectUri = `${protocol}://${host}/api/auth/callback`;
-    const appId = process.env.NEXT_PUBLIC_FB_APP_ID || "959311050110497";
-    const appSecret = process.env.FB_APP_SECRET || "943046142641ebaa6565cdca2cc738c1";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${req.headers.get("x-forwarded-proto") || "http"}://${req.headers.get("host")}`;
+    const redirectUri = `${baseUrl}/api/auth/callback`;
+    const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+    const appSecret = process.env.FB_APP_SECRET;
 
-    // 1. Exchange code for short-lived token
+    // 1. Exchange code for short-lived token via Instagram API
     const tokenRes = await fetch(
-      `https://graph.facebook.com/v21.0/oauth/access_token?client_id=${appId}&redirect_uri=${redirectUri}&client_secret=${appSecret}&code=${code}`
+      `https://api.instagram.com/oauth/access_token`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: appId || "",
+          client_secret: appSecret || "",
+          grant_type: "authorization_code",
+          redirect_uri: redirectUri,
+          code,
+        }),
+      }
     );
     const tokenData = await tokenRes.json();
     const shortToken = tokenData.access_token;
+    const igUserId = tokenData.user_id;
 
     if (!shortToken) {
       console.error("Failed to get short token", tokenData);
@@ -30,25 +40,22 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. Exchange for long-lived token
-    const longTokenData = await getLongLivedToken(shortToken);
-    const longToken = longTokenData.access_token;
+    const longRes = await fetch(
+      `https://graph.instagram.com/v21.0/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortToken}`
+    );
+    const longData = await longRes.json();
+    console.log("Long token response:", JSON.stringify(longData));
+    const longToken = longData.access_token;
 
     if (!longToken) {
-       console.error("Failed to get long token", longTokenData);
-       return NextResponse.redirect(new URL("/settings?error=long_token_failed", req.url));
+      console.error("Failed to get long token", JSON.stringify(longData));
+      return NextResponse.redirect(new URL(`/settings?error=long_token_failed&detail=${encodeURIComponent(longData?.error?.message || "unknown")}`, req.url));
     }
 
-    // 3. Find Instagram Business Account
-    const igId = await getInstagramBusinessAccount(longToken);
+    // 3. Save token + IG user ID
+    await updateAuthConfig(longToken, String(igUserId));
 
-    if (!igId) {
-      return NextResponse.redirect(new URL("/settings?error=no_ig_account", req.url));
-    }
-
-    // 4. Save to config
-    await updateAuthConfig(longToken, igId);
-
-    return NextResponse.redirect(new URL("/settings?success=connected", req.url));
+    return NextResponse.redirect(new URL("/dashboard?success=connected", req.url));
   } catch (error) {
     console.error("OAuth Callback Error", error);
     return NextResponse.redirect(new URL("/settings?error=internal", req.url));

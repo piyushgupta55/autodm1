@@ -88,7 +88,9 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-4">
-            <button className="w-full bg-[#111111] text-white flex items-center justify-center gap-3 py-4 rounded-xl font-bold hover:bg-black transition-all group">
+            <button 
+              onClick={() => { window.location.href = '/api/auth/facebook'; }}
+              className="w-full bg-[#111111] text-white flex items-center justify-center gap-3 py-4 rounded-xl font-bold hover:bg-black transition-all group">
               <Camera className="w-5 h-5" />
               Continue with Instagram
               <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
