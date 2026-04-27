@@ -1,18 +1,60 @@
 'use client';
 
-import { Zap, ExternalLink, ShieldCheck, Box } from 'lucide-react';
+import { Zap, ExternalLink, ShieldCheck, Box, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useInstagram } from '@/hooks/useInstagram';
+import { useState, useEffect } from 'react';
 
-const apps = [
-  { name: 'Zapier', desc: 'Connect with 5,000+ apps.', status: 'installed', icon: '⚡' },
-  { name: 'Make.com', desc: 'Advanced workflow automation.', status: 'connect', icon: 'M' },
-  { name: 'Shopify', desc: 'DM customers order updates.', status: 'connect', icon: 'S' },
-  { name: 'Slack', desc: 'Get notifications for every DM.', status: 'installed', icon: 'S' },
-  { name: 'Mailchimp', desc: 'Sync leads to your mail list.', status: 'connect', icon: 'M' },
-  { name: 'Circle', desc: 'Automate community access.', status: 'connect', icon: 'C' },
-];
+function InstagramIcon() {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    </svg>
+  );
+}
 
 export default function IntegrationsPage() {
+  const { connectAccount, loading: connecting } = useInstagram();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setProfile(data);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const apps = [
+    { 
+      name: 'Instagram', 
+      desc: 'Connect your Instagram Professional account for AutoDMs.', 
+      status: profile ? 'installed' : 'connect', 
+      icon: <InstagramIcon />,
+      onClick: profile ? undefined : connectAccount
+    },
+    { name: 'Zapier', desc: 'Connect with 5,000+ apps.', status: 'installed', icon: '⚡' },
+    { name: 'Make.com', desc: 'Advanced workflow automation.', status: 'connect', icon: 'M' },
+    { name: 'Shopify', desc: 'DM customers order updates.', status: 'connect', icon: 'S' },
+    { name: 'Slack', desc: 'Get notifications for every DM.', status: 'installed', icon: 'S' },
+    { name: 'Mailchimp', desc: 'Sync leads to your mail list.', status: 'connect', icon: 'M' },
+    { name: 'Circle', desc: 'Automate community access.', status: 'connect', icon: 'C' },
+  ];
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-12 animate-slideIn">
        <div>
@@ -40,15 +82,30 @@ export default function IntegrationsPage() {
                   </span>
                 )}
               </div>
-              <h3 className="font-bold text-lg text-accent">{app.name}</h3>
+              <h3 className="font-bold text-lg text-accent">
+                {app.name} 
+                {app.name === 'Instagram' && profile && (
+                  <span className="text-sm font-normal text-gray-400 ml-2">@{profile.username}</span>
+                )}
+              </h3>
               <p className="text-sm text-gray-500 mt-2">{app.desc}</p>
             </div>
 
-            <button className={`mt-8 w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-              app.status === 'installed' ? 'bg-secondary text-accent hover:bg-gray-200' : 'btn-primary'
-            }`}>
-              {app.status === 'installed' ? 'Configure' : 'Connect App'}
-              <ChevronRight className="w-4 h-4" />
+            <button 
+              onClick={app.onClick}
+              disabled={connecting && app.name === 'Instagram'}
+              className={`mt-8 w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                app.status === 'installed' ? 'bg-secondary text-accent hover:bg-gray-200' : 'btn-primary'
+              } disabled:opacity-50`}
+            >
+              {connecting && app.name === 'Instagram' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  {app.status === 'installed' ? 'Configure' : 'Connect App'}
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </motion.div>
         ))}
@@ -64,24 +121,5 @@ export default function IntegrationsPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function ChevronRight(props: any) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="3" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      {...props}
-    >
-      <path d="m9 18 6-6-6-6"/>
-    </svg>
   );
 }
