@@ -1,40 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
-import { exchangeCodeForToken, getAccountProfile } from "@/lib/instagram";
 import { updateAuthConfig } from "@/lib/configManager";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const state = searchParams.get("state");
 
   if (!code) {
-    return NextResponse.redirect(new URL("/dashboard?error=no_code", req.url));
+    return NextResponse.redirect(new URL("/settings?error=no_code", req.url));
   }
 
   try {
-    // 1. Exchange code for token (using the new platform API)
-    const tokenData = await exchangeCodeForToken(code);
-    const accessToken = tokenData.access_token;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${req.headers.get("x-forwarded-proto") || "http"}://${req.headers.get("host")}`;
+    const redirectUri = `${baseUrl}/api/auth/callback`;
+    const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+    const appSecret = process.env.FB_APP_SECRET;
 
-    if (!accessToken) {
-      throw new Error("Failed to get access token");
+    // 1. Exchange code for short-lived token via Instagram API
+    const tokenRes = await fetch(
+      `https://api.instagram.com/oauth/access_token`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: appId || "",
+          client_secret: appSecret || "",
+          grant_type: "authorization_code",
+          redirect_uri: redirectUri,
+          code,
+        }),
+      }
+    );
+    const tokenData = await tokenRes.json();
+    console.log("Short token response:", JSON.stringify(tokenData));
+    const shortToken = tokenData.access_token;
+    const igUserId = tokenData.user_id;
+
+    if (!shortToken) {
+      console.error("Failed to get short token", tokenData);
+      return NextResponse.redirect(new URL("/settings?error=token_failed", req.url));
     }
 
-    // 2. Get Instagram Profile info
-    const profile = await getAccountProfile(accessToken);
-    const instagramId = profile?.id;
+    // For Instagram Business Login (IGAAR tokens), the token is already long-lived (60 days)
+    // No separate exchange step needed
+    const longToken = shortToken;
+    console.log("Using token directly (IGAAR tokens are long-lived)");
 
-    if (!instagramId) {
-      throw new Error("Failed to get Instagram profile info");
-    }
+    // 3. Save token + IG user ID
+    await updateAuthConfig(longToken, String(igUserId));
 
-    // 3. Update database
-    await updateAuthConfig(accessToken, instagramId);
-
-    // 4. Redirect to dashboard
     return NextResponse.redirect(new URL("/dashboard?success=connected", req.url));
   } catch (error) {
-    console.error("Legacy OAuth Callback Error:", error);
-    return NextResponse.redirect(new URL("/dashboard?error=callback_failed", req.url));
+    console.error("OAuth Callback Error", error);
+    return NextResponse.redirect(new URL("/settings?error=internal", req.url));
   }
 }

@@ -8,12 +8,12 @@ import {
   Plus,
   Send,
   Camera,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 
 const stats = [
   { label: 'Total Sent', value: '0', change: '0%', icon: Send },
@@ -29,8 +29,8 @@ const recentActivity: any[] = [
 export default function Dashboard() {
   const [integrations, setIntegrations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConnectModal, setShowConnectModal] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -67,7 +67,7 @@ export default function Dashboard() {
           <p className="text-gray-500 mt-1">Welcome back! Here's what's happening today.</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn-secondary flex items-center gap-2" onClick={() => router.push('/settings')}>
+          <button className="btn-secondary flex items-center gap-2" onClick={() => setShowConnectModal(true)}>
             <Camera className="w-5 h-5" />
             Connect Account
           </button>
@@ -77,6 +77,67 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Connect Account Modal */}
+      <AnimatePresence>
+        {showConnectModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowConnectModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-accent">Connect an Account</h3>
+                <button onClick={() => setShowConnectModal(false)} className="text-gray-400 hover:text-accent transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-500 mb-6">Choose a platform to connect and start automating your DMs.</p>
+
+              <div className="space-y-3">
+                {/* Instagram */}
+                <button
+                  onClick={() => { window.location.href = '/api/auth/facebook'; }}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 hover:border-[#E1306C]/40 hover:bg-[#E1306C]/5 transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] flex items-center justify-center flex-shrink-0">
+                    <Camera className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-accent text-sm">Instagram</p>
+                    <p className="text-xs text-gray-400">Connect your Instagram Business account</p>
+                  </div>
+                  <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#E1306C] ml-auto transition-colors" />
+                </button>
+
+                {/* Facebook (coming soon) */}
+                <button
+                  disabled
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 opacity-50 cursor-not-allowed"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#1877F2] flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold text-lg leading-none">f</span>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-accent text-sm">Facebook <span className="text-xs font-normal text-gray-400 ml-1">Coming soon</span></p>
+                    <p className="text-xs text-gray-400">Connect your Facebook Page</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
